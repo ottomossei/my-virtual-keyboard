@@ -1,0 +1,35 @@
+@startuml
+node "Linux System" {
+    [User]
+    node "Hardware Devices" {
+        [Keyboard] 
+    }
+
+    node "Input Subsystem" {
+        [Input Event System] #white
+        [uinput Device : /dev/uinput]
+        [Event File : /dev/input/eventX]
+    }
+
+    node "MyVirtualKeyboard Project" {
+        [run_virtual_keyboard.sh]
+        [MyVirtualKeyboard Program]
+    }
+}
+
+User --> [run_virtual_keyboard.sh] : Run script
+[run_virtual_keyboard.sh] --> [Event File : /dev/input/eventX] : Find keyboard event file
+[run_virtual_keyboard.sh] --> [MyVirtualKeyboard Program] : Pass event file path
+
+[MyVirtualKeyboard Program] --> [Event File : /dev/input/eventX] : Open for reading
+[MyVirtualKeyboard Program] --> [uinput Device : /dev/uinput] : Open for writing
+
+[MyVirtualKeyboard Program] --> [Event File : /dev/input/eventX] : Grab device
+[MyVirtualKeyboard Program] --> [uinput Device : /dev/uinput] : Setup virtual keyboard
+
+[MyVirtualKeyboard Program] --> [Event File : /dev/input/eventX] : Read input events
+[MyVirtualKeyboard Program] --> [uinput Device : /dev/uinput] : Emit modified events
+
+[Keyboard] --> [Event File : /dev/input/eventX] : Generates input events
+
+@enduml
